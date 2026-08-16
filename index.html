@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت مشاوران املاک - nafthome</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { width: 100%; max-width: 1200px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { color: #1a237e; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #e8eaf6; padding-bottom: 15px; }
+        .login-box { background: #e8eaf6; padding: 30px; border-radius: 16px; max-width: 450px; margin: 20px auto; text-align: center; }
+        .login-box input { padding: 12px 20px; border: 2px solid #c5cae9; border-radius: 30px; width: 70%; font-size: 16px; outline: none; }
+        .login-box input:focus { border-color: #3949ab; }
+        .login-box button { padding: 12px 30px; background: #3949ab; color: white; border: none; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; margin-right: 10px; }
+        .login-box button:hover { background: #1a237e; }
+        .error-msg { color: #d32f2f; margin-top: 12px; }
+        .panel { display: none; margin-top: 20px; }
+        .user-badge { display: inline-block; background: #e8eaf6; padding: 8px 18px; border-radius: 30px; font-weight: 600; color: #1a237e; margin-bottom: 20px; }
+        .form-row { background: #f5f7ff; padding: 25px; border-radius: 16px; display: flex; flex-wrap: wrap; gap: 15px 10px; align-items: center; margin-bottom: 30px; border: 1px solid #e0e4f0; }
+        .form-row input { flex: 1 0 150px; padding: 10px 16px; border: 2px solid #dce1ef; border-radius: 30px; font-size: 15px; outline: none; }
+        .form-row input:focus { border-color: #3949ab; }
+        .form-row button { flex: 0 0 auto; padding: 10px 28px; background: #2e7d32; color: white; border: none; border-radius: 30px; font-weight: 600; font-size: 15px; cursor: pointer; }
+        .form-row button:hover { background: #1b5e20; }
+        .form-row button:disabled { background: #999; cursor: not-allowed; }
+        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #e8eaf6; }
+        table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        th { background: #1a237e; color: white; padding: 14px 12px; text-align: center; }
+        td { padding: 14px 12px; text-align: center; border-bottom: 1px solid #e8eaf6; }
+        tr:hover td { background: #f5f7ff; }
+        .row-user-me { background: #e3f2fd !important; }
+        .row-user-brother { background: #f3e5f5 !important; }
+        .badge-user { display: inline-block; padding: 4px 14px; border-radius: 30px; font-size: 13px; font-weight: 600; color: white; }
+        .badge-me { background: #0d47a1; }
+        .badge-brother { background: #6a1b9a; }
+        .logout-btn { background: #d32f2f; color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; cursor: pointer; float: left; }
+        .logout-btn:hover { background: #b71c1c; }
+        .clearfix::after { content: ""; clear: both; display: table; }
+        .status-msg { padding: 10px 20px; border-radius: 30px; margin: 10px 0; text-align: center; font-weight: 500; }
+        .status-success { background: #e8f5e9; color: #1b5e20; }
+        .status-error { background: #ffebee; color: #b71c1c; }
+        .status-loading { background: #fff3e0; color: #e65100; }
+        .status-info { background: #e3f2fd; color: #0d47a1; }
+        .empty-msg { text-align: center; padding: 40px 20px; color: #757575; }
+        .setup-box { background: #fff3e0; padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 2px solid #ffb74d; }
+        .setup-box input { width: 100%; padding: 10px 16px; margin: 5px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; }
+        .setup-box label { font-weight: 600; color: #333; display: block; margin-top: 10px; }
+        .setup-box button { padding: 10px 25px; background: #f57c00; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .setup-box button:hover { background: #e65100; }
+        .github-link-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #24292e;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .github-link-btn:hover { background: #0366d6; }
+        @media (max-width: 700px) {
+            .form-row input { flex: 1 0 100%; }
+            .form-row button { width: 100%; justify-content: center; }
+            .login-box input { width: 100%; margin-bottom: 12px; }
+            .login-box button { width: 100%; margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🏢 مدیریت مشاوران املاک</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 20px;">ریپازیتوری: <strong>nafthome</strong></p>
+
+    <!-- تنظیمات ریپازیتوری -->
+    <div class="setup-box" id="setupBox">
+        <h3>🔧 تنظیمات ریپازیتوری</h3>
+        <p style="font-size: 14px; color: #555; margin: 10px 0;">
+            نام کاربری GitHub خود را وارد کنید.
+            <br>
+            <small>ریپازیتوری: <strong>nafthome</strong> (ثابت)</small>
+        </p>
+        <label>نام کاربری GitHub:</label>
+        <input type="text" id="githubUsername" placeholder="your-username" />
+        <button onclick="saveSettings()">💾 ذخیره تنظیمات</button>
+        <div id="setupStatus" style="margin-top: 8px; font-size: 14px;"></div>
+    </div>
+
+    <!-- ورود -->
+    <div id="loginSection" class="login-box">
+        <h3>🔐 ورود به سیستم</h3>
+        <input type="password" id="passwordInput" placeholder="رمز عبور را وارد کنید" />
+        <button onclick="handleLogin()">ورود</button>
+        <div id="loginError" class="error-msg"></div>
+        <div style="margin-top: 16px; font-size: 14px; color: #555;">
+            رمزهای مجاز: <strong>me</strong> (برای شما) و <strong>brother</strong> (برای برادرتان)
+        </div>
+    </div>
+
+    <!-- پنل اصلی -->
+    <div id="mainPanel" class="panel">
+        <div class="clearfix">
+            <span class="user-badge" id="userBadge">👤 وارد شده به عنوان: </span>
+            <button class="logout-btn" onclick="handleLogout()">🚪 خروج</button>
+        </div>
+
+        <div id="syncStatus" class="status-msg status-info">
+            💡 برای ذخیره دائمی، اطلاعات را وارد کرده و روی "افزودن سطر" کلیک کنید.
+        </div>
+
+        <div class="form-row">
+            <input type="text" id="agentName" placeholder="نام مشاور املاک" />
+            <input type="text" id="consultantName" placeholder="نام مشاور" />
+            <input type="text" id="phoneNumber" placeholder="شماره تماس" />
+            <input type="date" id="contactDate" />
+            <input type="text" id="resultText" placeholder="نتیجه تماس" />
+            <button onclick="addRecord()" id="addBtn">➕ افزودن سطر</button>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <a href="#" id="githubEditLink" target="_blank" class="github-link-btn">✏️ ویرایش فایل data.json در GitHub</a>
+            <a href="#" id="githubViewLink" target="_blank" class="github-link-btn" style="background: #0366d6;">📂 مشاهده ریپازیتوری</a>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ثبت‌کننده</th>
+                        <th>نام مشاور املاک</th>
+                        <th>نام مشاور</th>
+                        <th>شماره تماس</th>
+                        <th>تاریخ تماس</th>
+                        <th>نتیجه</th>
+                        <th>زمان ثبت</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsBody">
+                    <tr><td colspan="7" class="empty-msg">در حال بارگذاری...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== تنظیمات ====================
+    const REPO_NAME = 'nafthome';
+    let CONFIG = { username: '' };
+    let records = [];
+    let currentUser = null;
+    let isLoading = false;
+
+    // بارگذاری تنظیمات از localStorage
+    function loadSettings() {
+        const saved = localStorage.getItem('repoConfig');
+        if (saved) {
+            try {
+                CONFIG = JSON.parse(saved);
+                document.getElementById('githubUsername').value = CONFIG.username || '';
+            } catch(e) {}
+        }
+        updateLinks();
+    }
+
+    function saveSettings() {
+        const username = document.getElementById('githubUsername').value.trim();
+
+        if (!username) {
+            document.getElementById('setupStatus').innerHTML = '❌ لطفاً نام کاربری را وارد کنید.';
+            document.getElementById('setupStatus').style.color = '#d32f2f';
+            return;
+        }
+
+        CONFIG = { username };
+        localStorage.setItem('repoConfig', JSON.stringify(CONFIG));
+        document.getElementById('setupStatus').innerHTML = '✅ تنظیمات ذخیره شد!';
+        document.getElementById('setupStatus').style.color = '#2e7d32';
+        updateLinks();
+        
+        if (currentUser) {
+            loadRecords();
+        }
+    }
+
+    function updateLinks() {
+        const { username } = CONFIG;
+        if (username) {
+            document.getElementById('githubEditLink').href = `https://github.com/${username}/${REPO_NAME}/edit/main/data.json`;
+            document.getElementById('githubEditLink').style.display = 'inline-block';
+            document.getElementById('githubViewLink').href = `https://github.com/${username}/${REPO_NAME}`;
+            document.getElementById('githubViewLink').style.display = 'inline-block';
+        } else {
+            document.getElementById('githubEditLink').style.display = 'none';
+            document.getElementById('githubViewLink').style.display = 'none';
+        }
+    }
+
+    // ==================== بارگذاری از فایل JSON ====================
+    async function loadRecords() {
+        if (isLoading) return;
+        isLoading = true;
+
+        const statusDiv = document.getElementById('syncStatus');
+        statusDiv.className = 'status-msg status-loading';
+        statusDiv.textContent = '⏳ در حال بارگذاری از GitHub...';
+
+        try {
+            const { username } = CONFIG;
+            if (!username) {
+                statusDiv.className = 'status-msg status-error';
+                statusDiv.textContent = '⚠️ لطفاً نام کاربری را در تنظیمات وارد کنید.';
+                isLoading = false;
+                return;
+            }
+
+            // آدرس فایل JSON در GitHub Pages
+            const url = `https://raw.githubusercontent.com/${username}/${REPO_NAME}/main/data.json`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('فایل data.json پیدا نشد. لطفاً آن را در ریپازیتوری ایجاد کنید.');
+                }
+                throw new Error(`خطا: ${response.status}`);
+            }
+
+            const data = await response.json();
+            records = data.records || [];
+            records.sort((a, b) => b.timestamp - a.timestamp);
+
+            statusDiv.className = 'status-msg status-success';
+            statusDiv.textContent = `✅ ${records.length} رکورد بارگذاری شد.`;
+            renderTable();
+
+        } catch (error) {
+            statusDiv.className = 'status-msg status-error';
+            statusDiv.textContent = `❌ ${error.message}`;
+            console.error('Error loading records:', error);
+            const tbody = document.getElementById('recordsBody');
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">❌ ${error.message}</td></tr>`;
+        }
+        
+        isLoading = false;
+    }
+
+    // ==================== ذخیره در فایل JSON ====================
+    async function saveRecordToGitHub(record) {
+        const { username } = CONFIG;
+        if (!username) {
+            alert('لطفاً نام کاربری را در تنظیمات وارد کنید.');
+            return false;
+        }
+
+        try {
+            // 1. دریافت فایل فعلی
+            const url = `https://api.github.com/repos/${username}/${REPO_NAME}/contents/data.json`;
+            const getResponse = await fetch(url, {
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!getResponse.ok) {
+                throw new Error('امکان دریافت فایل data.json');
+            }
+
+            const fileData = await getResponse.json();
+            const currentContent = atob(fileData.content);
+            const jsonData = JSON.parse(currentContent);
+            
+            // 2. اضافه کردن رکورد جدید
+            jsonData.records.unshift(record);
+            
+            // 3. ذخیره فایل
+            const newContent = btoa(JSON.stringify(jsonData, null, 2));
+            const putResponse = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `افزودن رکورد جدید - ${record.agentName}`,
+                    content: newContent,
+                    sha: fileData.sha
+                })
+            });
+
+            if (!putResponse.ok) {
+                throw new Error('خطا در ذخیره فایل');
+            }
+
+            return true;
+
+        } catch (error) {
+            console.error('Error saving record:', error);
+            // اگر خطا داشت، لینک ویرایش دستی را باز می‌کنیم
+            window.open(`https://github.com/${username}/${REPO_NAME}/edit/main/data.json`, '_blank');
+            alert(`❌ خطا در ذخیره خودکار: ${error.message}\n\nلطفاً به صورت دستی فایل را ویرایش کنید.`);
+            return false;
+        }
+    }
+
+    // ==================== توابع اصلی ====================
+    function renderTable() {
+        const tbody = document.getElementById('recordsBody');
+        
+        if (!records || records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-msg">هیچ رکوردی ثبت نشده است.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        records.forEach((rec) => {
+            const isMe = rec.creator === 'me';
+            const rowClass = isMe ? 'row-user-me' : 'row-user-brother';
+            const badgeClass = isMe ? 'badge-me' : 'badge-brother';
+            const creatorLabel = isMe ? 'من' : 'برادرم';
+            const dateObj = new Date(rec.timestamp);
+            const timeStr = dateObj.toLocaleString('fa-IR', { hour12: false });
+
+            html += `
+                <tr class="${rowClass}">
+                    <td><span class="badge-user ${badgeClass}">${creatorLabel}</span></td>
+                    <td>${rec.agentName || ''}</td>
+                    <td>${rec.consultantName || ''}</td>
+                    <td>${rec.phone || ''}</td>
+                    <td>${rec.date || ''}</td>
+                    <td>${rec.result || ''}</td>
+                    <td style="font-size: 13px; color: #555;">${timeStr}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function showPanel(show) {
+        document.getElementById('loginSection').style.display = show ? 'none' : 'block';
+        document.getElementById('mainPanel').style.display = show ? 'block' : 'none';
+        if (show) {
+            loadRecords();
+        }
+    }
+
+    function updateUserBadge() {
+        const badge = document.getElementById('userBadge');
+        if (currentUser === 'me') {
+            badge.innerHTML = '👤 وارد شده به عنوان: <strong style="color:#0d47a1;">من</strong>';
+        } else if (currentUser === 'brother') {
+            badge.innerHTML = '👤 وارد شده به عنوان: <strong style="color:#6a1b9a;">برادرم</strong>';
+        } else {
+            badge.innerHTML = '👤 وارد نشده';
+        }
+    }
+
+    function handleLogin() {
+        const input = document.getElementById('passwordInput');
+        const pass = input.value.trim();
+
+        if (pass === 'me' || pass === 'brother') {
+            currentUser = pass;
+            input.value = '';
+            document.getElementById('loginError').textContent = '';
+            showPanel(true);
+            updateUserBadge();
+        } else {
+            document.getElementById('loginError').textContent = '❌ رمز عبور اشتباه است.';
+            input.value = '';
+        }
+    }
+
+    function handleLogout() {
+        currentUser = null;
+        showPanel(false);
+        updateUserBadge();
+    }
+
+    async function addRecord() {
+        if (!currentUser) {
+            alert('لطفاً ابتدا وارد شوید.');
+            return;
+        }
+
+        const agent = document.getElementById('agentName').value.trim();
+        const consultant = document.getElementById('consultantName').value.trim();
+        const phone = document.getElementById('phoneNumber').value.trim();
+        const date = document.getElementById('contactDate').value;
+        const result = document.getElementById('resultText').value.trim();
+
+        if (!agent || !consultant || !phone || !date || !result) {
+            alert('❌ لطفاً تمام فیلدها را پر کنید.');
+            return;
+        }
+
+        const newRecord = {
+            agentName: agent,
+            consultantName: consultant,
+            phone: phone,
+            date: date,
+            result: result,
+            creator: currentUser,
+            timestamp: Date.now()
+        };
+
+        const addBtn = document.getElementById('addBtn');
+        addBtn.disabled = true;
+        addBtn.textContent = '⏳ در حال ذخیره...';
+
+        try {
+            // ذخیره در GitHub
+            const success = await saveRecordToGitHub(newRecord);
+            
+            if (success) {
+                // به روز رسانی جدول
+                records.unshift(newRecord);
+                renderTable();
+                
+                // پاک کردن فرم
+                document.getElementById('agentName').value = '';
+                document.getElementById('consultantName').value = '';
+                document.getElementById('phoneNumber').value = '';
+                document.getElementById('contactDate').value = '';
+                document.getElementById('resultText').value = '';
+
+                document.getElementById('syncStatus').className = 'status-msg status-success';
+                document.getElementById('syncStatus').textContent = '✅ رکورد با موفقیت ذخیره شد!';
+                
+                // بارگذاری مجدد بعد از ۲ ثانیه
+                setTimeout(() => loadRecords(), 2000);
+            }
+
+        } catch (error) {
+            document.getElementById('syncStatus').className = 'status-msg status-error';
+            document.getElementById('syncStatus').textContent = `❌ خطا: ${error.message}`;
+        } finally {
+            addBtn.disabled = false;
+            addBtn.textContent = '➕ افزودن سطر';
+        }
+    }
+
+    // ==================== مقداردهی اولیه ====================
+    loadSettings();
+    showPanel(false);
+    updateUserBadge();
+
+    // ورود با Enter
+    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+    });
+
+    // افزودن با Enter
+    document.querySelectorAll('.form-row input').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addRecord();
+            }
+        });
+    });
+
+    // بارگذاری خودکار هر ۳۰ ثانیه
+    setInterval(() => {
+        if (currentUser) {
+            loadRecords();
+        }
+    }, 30000);
+</script>
+</body>
+</html>
